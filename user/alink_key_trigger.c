@@ -60,10 +60,17 @@ static void key_sw2_long_press(void)
 
 void alink_key_trigger()
 {
+#if 0
     single_key[0] = key_init_single(13, PERIPHS_IO_MUX_MTCK_U, FUNC_GPIO13,
                                     key_13_long_press, key_13_short_press);
     single_key[1] = key_init_single(4 , PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4,
                                     key_sw2_long_press, key_sw2_short_press);
+#else
+    single_key[0] = key_init_single(5, PERIPHS_IO_MUX_GPIO5_U, FUNC_GPIO5,
+                                    key_13_long_press, key_13_short_press);
+    single_key[1] = key_init_single(0 , PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0,
+                                    key_sw2_long_press, key_sw2_short_press);
+#endif
     keys.key_num = 2;
     keys.single_key = single_key;
     key_init(&keys);
