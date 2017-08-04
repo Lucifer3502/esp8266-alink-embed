@@ -30,6 +30,7 @@
 #include "esp_alink.h"
 #include "esp_alink_log.h"
 #include "esp_json_parser.h"
+#include "spi_flash.h"
 
 #ifndef ALINK_PASSTHROUGH
 
@@ -47,11 +48,13 @@ typedef struct virtual_dev {
 /**
  * @brief As a unique identifier for the sds device
  */
-#define device_key              "xrSJSzVDKPk4UB7BGCIf"
-#define device_secret           "cRB3lwgd7zwFg02DK69xxl2lgefDdtYZ"
+#define CONFIG_DEVICE_INFO      0xf8000
+#define device_key              "gnF9Gg0jxNh0dVhRc3ll"
+#define device_secret           "ZRHhQ1M54LNVcm4heq8y0tH2gsM4FXPo"
 #define DEVICE_KEY_LEN          (20 + 1)
 #define DEVICE_SECRET_LEN       (32 + 1)
-
+#define CONFIG_DEVICE_BUF_LEN   (DEVICE_KEY_LEN + DEVICE_SECRET_LEN + 2)
+#if 0
 char *product_get_device_key(char key_str[DEVICE_KEY_LEN])
 {
     return strncpy(key_str, device_key, DEVICE_KEY_LEN);
@@ -61,6 +64,46 @@ char *product_get_device_secret(char secret_str[DEVICE_SECRET_LEN])
 {
     return strncpy(secret_str, device_secret, DEVICE_SECRET_LEN);
 }
+#endif
+
+char *product_get_device_key(char key_str[DEVICE_KEY_LEN])
+{
+	char key[CONFIG_DEVICE_BUF_LEN] = {0};
+	spi_flash_read(CONFIG_DEVICE_INFO, (uint32 *)key, CONFIG_DEVICE_BUF_LEN);
+	if(*((uint32_t *)key) == ~0x0) {
+		ALINK_LOGW("Device has no key, please write them");
+		return NULL;
+	}
+    memcpy(key_str, key, DEVICE_KEY_LEN);
+	key_str[DEVICE_KEY_LEN-1] = '\0';
+	return key_str;
+}
+
+char *product_get_device_secret(char secret_str[DEVICE_SECRET_LEN])
+{
+    char key[CONFIG_DEVICE_BUF_LEN] = {0};
+	spi_flash_read(CONFIG_DEVICE_INFO, (uint32 *)key, CONFIG_DEVICE_BUF_LEN);
+	if(*((uint32_t *)key) == ~0x0) {
+		ALINK_LOGW("Device has no secret, please write them");
+		return NULL;
+	}
+    memcpy(secret_str, key + DEVICE_KEY_LEN, DEVICE_SECRET_LEN);
+	secret_str[DEVICE_SECRET_LEN - 1] = '\0';
+	return secret_str;
+}
+
+static int is_device_info_exist(void)
+{
+	char key[DEVICE_KEY_LEN] = {0};
+	char secret[DEVICE_SECRET_LEN] = {0};
+	if (product_get_device_key(key) == NULL || product_get_device_secret(secret) == NULL) {
+		return 0;
+	}
+	ALINK_LOGI("Device key: %s", key);
+	ALINK_LOGI("Device secret: %s", secret);
+	return 1;
+}
+
 
 /**
  * @brief  In order to simplify the analysis of json package operations,
@@ -338,6 +381,14 @@ static void alink_app_main_task(void *arg)
         .secret_sandbox = "THnfRRsU5vu6g6m9X6uFyAjUWflgZ0iyGjdEneKm",
     };
 
+    if(!is_device_info_exist())
+    {
+        //DEVICE_KEY_LEN + DEVICE_SECRET_LEN + 2 = 21 + 33 + 2 = 56, 56 /4 = 14
+        char key[CONFIG_DEVICE_BUF_LEN] = {0};
+        memcpy(key, device_key, DEVICE_KEY_LEN);
+        memcpy(key + DEVICE_KEY_LEN, device_secret, DEVICE_SECRET_LEN);
+        spi_flash_write(CONFIG_DEVICE_INFO, (uint32 *)key, CONFIG_DEVICE_BUF_LEN);
+    }
     /**
      * @brief You can use other trigger mode, to trigger the distribution network, activation and other operations
      */
