@@ -49,8 +49,8 @@ typedef struct virtual_dev {
  * @brief As a unique identifier for the sds device
  */
 #define CONFIG_DEVICE_INFO      0xf8000
-#define device_key              "gnF9Gg0jxNh0dVhRc3ll"
-#define device_secret           "ZRHhQ1M54LNVcm4heq8y0tH2gsM4FXPo"
+#define device_key              "xrSJSzVDKPk4UB7BGCIf"
+#define device_secret           "cRB3lwgd7zwFg02DK69xxl2lgefDdtYZ"
 #define DEVICE_KEY_LEN          (20 + 1)
 #define DEVICE_SECRET_LEN       (32 + 1)
 #define CONFIG_DEVICE_BUF_LEN   (DEVICE_KEY_LEN + DEVICE_SECRET_LEN + 2)
