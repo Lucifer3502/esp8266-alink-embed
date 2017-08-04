@@ -1,3 +1,4 @@
+
 本工程为阿里云 ALINK EMBED 接口使用示例，你可以通过本示例了解 ALINK 配网、升级及数据传输等。
 
 ## 开发板准备和介绍
@@ -69,4 +70,7 @@ git clone --recursive https://zzchen@gitlab.espressif.cn:6688/customer/esp8266-e
 - 阿里智能开放平台：https://open.aliplus.com/docs/open/
 - 烧录工具  : http://espressif.com/en/support/download/other-tools
 - 串口驱动  : http://www.usb-drivers.org/ft232r-usb-uart-driver.html
+
+=======
+# esp8266-alink-embed
 
